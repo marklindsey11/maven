@@ -143,7 +143,7 @@ public class DefaultMavenPluginManager
     private PluginVersionResolver pluginVersionResolver;
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
-    private MavenPluginConfigurationValidator configurationValidator;
+    private List<MavenPluginConfigurationValidator> configurationValidator;
 
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -160,7 +160,7 @@ public class DefaultMavenPluginManager
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,
             MavenPluginValidator pluginValidator,
-            MavenPluginConfigurationValidator configurationValidator )
+            List<MavenPluginConfigurationValidator> configurationValidator )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -606,7 +606,10 @@ public class DefaultMavenPluginManager
 
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
-            configurationValidator.validate( mojoDescriptor, pomConfiguration, expressionEvaluator );
+            for ( MavenPluginConfigurationValidator validator: configurationValidator )
+            {
+                validator.validate( mojoDescriptor, pomConfiguration, expressionEvaluator );
+            }
 
             populateMojoExecutionFields( mojo, mojoExecution.getExecutionId(), mojoDescriptor, pluginRealm,
                                          pomConfiguration, expressionEvaluator );
